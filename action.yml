@@ -53,7 +53,6 @@ runs:
     - name: 🛠 Install Vale
       shell: bash
       run: |
-        mkdir -p ${RUNNER_TEMP}/bin
         if [[ "${{ inputs.version }}" = "" ]]; then
           valeVersion="$(curl -sfL https://api.github.com/repos/errata-ai/vale/releases/latest | grep '"tag_name":' | cut -d \" -f 4 | cut -d v -f 2)"
         else
@@ -63,11 +62,16 @@ runs:
           echo "::error title=invalid version::vale version '${valeVersion}' is not a valid semver version"
           exit 1
         fi
+        echo "::group::Vale Installation"
         curl -sfL https://github.com/errata-ai/vale/releases/download/v${valeVersion}/vale_${valeVersion}_Linux_64-bit.tar.gz -o vale.tar.gz
+        mkdir -p ${RUNNER_TEMP}/bin
         tar -xvzf vale.tar.gz -C ${RUNNER_TEMP}/bin
         rm vale.tar.gz
         echo "${RUNNER_TEMP}/bin" >> $GITHUB_PATH
+        echo "::endgroup::"
+        echo "::group::Syncing Vale"
         ${RUNNER_TEMP}/bin/vale sync
+        echo "::endgroup::"
 
     - name: 🧑‍🏫 Run Vale
       if: ${{ inputs.reviewdog != 'true' }}
@@ -78,11 +82,18 @@ runs:
       if: ${{ inputs.reviewdog == 'true' }}
       shell: bash
       run: |
+        echo "::group::Reviewdog Installation"
         curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh | sh -s -- -b ${RUNNER_TEMP}/bin
+        echo "::endgroup::"
 
     - name: 🧑‍🏫 Run Vale with Reviewdog
       if: ${{ inputs.reviewdog == 'true' }}
       shell: bash
       env:
         REVIEWDOG_GITHUB_API_TOKEN: ${{ inputs.github_token }}
-      run: vale --no-exit --output=$GITHUB_ACTION_PATH/rdjsonl.tmpl ${{ inputs.flags }} ${{ inputs.files }} | reviewdog -f=rdjsonl -name=vale -reporter=${{ inputs.reporter }} -fail-on-error=${{ inputs.fail_on_error }} -filter-mode=${{ inputs.filter_mode }} -level=info
+      run: |
+        output=$(vale --no-exit --output=$GITHUB_ACTION_PATH/rdjsonl.tmpl ${{ inputs.flags }} ${{ inputs.files }})
+        echo "::group::Vale output for Reviewdog"
+        echo -e "$output"
+        echo "::endgroup::"
+        echo -e "$output" | reviewdog -f=rdjsonl -name=vale -reporter=${{ inputs.reporter }} -fail-on-error=${{ inputs.fail_on_error }} -filter-mode=${{ inputs.filter_mode }} -level=info
