@@ -42,7 +42,7 @@ runs:
       shell: bash
       run: |
         if ! [ "$RUNNER_OS" == "Linux" ]; then
-          echo "ERROR: simbo/vale-action is only for linux runners"
+          echo "::error title=runner os is $RUNNER_OS::simbo/vale-action is only for linux runners"
           exit 1
         fi
 
@@ -56,7 +56,7 @@ runs:
           valeVersion="${{ inputs.version }}"
         fi
         if ! [[ "$valeVersion" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-          echo "ERROR: vale version '${valeVersion}' is not a valid semver version"
+          echo "::error title=invalid version::vale version '${valeVersion}' is not a valid semver version"
           exit 1
         fi
         curl -sfL https://github.com/errata-ai/vale/releases/download/v${valeVersion}/vale_${valeVersion}_Linux_64-bit.tar.gz -o vale.tar.gz
