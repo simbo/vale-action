@@ -85,4 +85,4 @@ runs:
       shell: bash
       env:
         REVIEWDOG_GITHUB_API_TOKEN: ${{ inputs.github_token }}
-      run: vale --output=$GITHUB_ACTION_PATH/rdjsonl.tmpl ${{ inputs.flags }} ${{ inputs.files }} | reviewdog -f=rdjsonl -name=vale -reporter=${{ inputs.reporter }} -fail-on-error=${{ inputs.fail_on_error }} -filter-mode=${{ inputs.filter_mode }} -level=info
+      run: vale --no-exit --output=$GITHUB_ACTION_PATH/rdjsonl.tmpl ${{ inputs.flags }} ${{ inputs.files }} | reviewdog -f=rdjsonl -name=vale -reporter=${{ inputs.reporter }} -fail-on-error=${{ inputs.fail_on_error }} -filter-mode=${{ inputs.filter_mode }} -level=info
