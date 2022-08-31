@@ -1,6 +1,6 @@
 # simbo/vale-action
 
-A GitHub action to run Vale for spellchecking.
+A GitHub action to run [Vale](https://vale.sh/) for spell-checking.
 
 It does pretty much the same like the [official Vale action](https://github.com/errata-ai/vale-action),
 but as this one is not using Docker, it's much faster.
@@ -8,6 +8,8 @@ but as this one is not using Docker, it's much faster.
 ## Usage
 
 Use `simbo/vale-action@v1` in your GitHub action workflow.
+
+Your project should have a [`vale.ini`](https://vale.sh/docs/vale-cli/structure/).
 
 ### Example
 
@@ -19,7 +21,7 @@ jobs:
       - name: 🛎 Checkout
         uses: actions/checkout@v3
 
-      - name: 🧑‍🏫 Spellcheck
+      - name: 🧑‍🏫 Spell-Check
         env:
           GITHUB_TOKEN: ${{ github.token }}
         uses: simbo/vale-action@v1

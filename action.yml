@@ -1,5 +1,5 @@
-name: Vale
-description: A GitHub action to run vale for spellchecking.
+name: Vale Spell-Check
+description: Run Vale for spell-checking - much faster than the official Vale action.
 
 branding:
   icon: edit
