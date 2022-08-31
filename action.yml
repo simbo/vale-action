@@ -62,7 +62,8 @@ runs:
         curl -sfL https://github.com/errata-ai/vale/releases/download/v${valeVersion}/vale_${valeVersion}_Linux_64-bit.tar.gz -o vale.tar.gz
         tar -xvzf vale.tar.gz -C ${RUNNER_TEMP}/bin
         rm vale.tar.gz
-        ${RUNNER_TEMP}/bin/vale sync
+        echo "${RUNNER_TEMP}/bin" >> $GITHUB_PATH
+        vale sync
 
     - name: 🛠 Install Reviewdog
       if: ${{ inputs.reviewdog == 'true' }}
@@ -73,9 +74,9 @@ runs:
     - name: 🧑‍🏫 Run Vale with Reviewdog
       if: ${{ inputs.reviewdog == 'true' }}
       shell: bash
-      run: ${RUNNER_TEMP}/bin/vale --output=rdjsonl.tmpl ${{ inputs.flags }} ${{ inputs.files }} | ${RUNNER_TEMP}/bin/reviewdog -f=rdjsonl -name=vale -reporter=${{ inputs.reporter }} -fail-on-error=${{ inputs.fail_on_error }} -filter-mode=${{ inputs.filter_mode }} -level=info
+      run: vale --output=$GITHUB_ACTION_PATH/rdjsonl.tmpl ${{ inputs.flags }} ${{ inputs.files }} | reviewdog -f=rdjsonl -name=vale -reporter=${{ inputs.reporter }} -fail-on-error=${{ inputs.fail_on_error }} -filter-mode=${{ inputs.filter_mode }} -level=info
 
     - name: 🧑‍🏫 Run Vale
       if: ${{ inputs.reviewdog != 'true' }}
       shell: bash
-      run: ${RUNNER_TEMP}/bin/vale ${{ inputs.flags }} ${{ inputs.files }}
+      run: vale ${{ inputs.flags }} ${{ inputs.files }}
