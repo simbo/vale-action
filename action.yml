@@ -29,11 +29,11 @@ inputs:
   reporter:
     description: Set the reporter type for Reviewdog.
     required: false
-    default: "github-pr-review"
+    default: "github-pr-check"
   fail_on_error:
     description: By default, Reviewdog will return exit code 0 even if it finds errors. If `fail_on_error` is enabled, Reviewdog exits with 1 when at least one error was reported.
     required: false
-    default: "true"
+    default: "false"
   filter_mode:
     description: Set the [filter mode](https://github.com/reviewdog/reviewdog#filter-mode) for Reviewdog.
     required: false
