@@ -22,6 +22,10 @@ inputs:
     description: Whether to use Vale with Reviewdog.
     required: false
     default: "false"
+  github_token:
+    description: The GitHub repo access token to be used for Reviewdog.
+    required: false
+    default: ${{ github.token }}
   reporter:
     description: Set the reporter type for Reviewdog.
     required: false
@@ -74,6 +78,8 @@ runs:
     - name: 🧑‍🏫 Run Vale with Reviewdog
       if: ${{ inputs.reviewdog == 'true' }}
       shell: bash
+      env:
+        REVIEWDOG_GITHUB_API_TOKEN: ${ inputs.github_token}
       run: vale --output=$GITHUB_ACTION_PATH/rdjsonl.tmpl ${{ inputs.flags }} ${{ inputs.files }} | reviewdog -f=rdjsonl -name=vale -reporter=${{ inputs.reporter }} -fail-on-error=${{ inputs.fail_on_error }} -filter-mode=${{ inputs.filter_mode }} -level=info
 
     - name: 🧑‍🏫 Run Vale

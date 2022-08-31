@@ -27,15 +27,16 @@ jobs:
 
 ## Inputs
 
-| Input           | Required | Default              | Description                                                                                                                                                        |
-| --------------- | -------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `version`       | no       | (latest)             | Vale release version to use.                                                                                                                                       |
-| `flags`         | no       | `''`                 | Space-delimited list of flags for the Vale CLI. To see a full list of available flags, run `vale -h`.                                                              |
-| `files`         | no       | `'.'`                | Space-delimited list of file or directory arguments; equivalent to calling `vale input1 input2`.                                                                   |
-| `reviewdog`     | no       | `'false'`            | Whether to use Vale with Reviewdog.                                                                                                                                |
-| `reporter`      | no       | `'github-pr-review'` | Set the [reporter](https://github.com/reviewdog/reviewdog#reporters) type for Reviewdog.                                                                           |
-| `fail_on_error` | no       | `'true'`             | By default, Reviewdog will return exit code 0 even if it finds errors. If `fail_on_error` is enabled, Reviewdog exits with 1 when at least one error was reported. |
-| `filter_mode`   | no       | `'added'`            | Set the [filter mode](https://github.com/reviewdog/reviewdog#filter-mode) for Reviewdog.                                                                           |
+| Input           | Required | Default                 | Description                                                                                                                                                        |
+| --------------- | -------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `version`       | no       | (latest)                | Vale release version to use.                                                                                                                                       |
+| `flags`         | no       | `''`                    | Space-delimited list of flags for the Vale CLI. To see a full list of available flags, run `vale -h`.                                                              |
+| `files`         | no       | `'.'`                   | Space-delimited list of file or directory arguments; equivalent to calling `vale input1 input2`.                                                                   |
+| `reviewdog`     | no       | `'false'`               | Whether to use Vale with Reviewdog.                                                                                                                                |
+| `github_token`  | no       | `'${{ github.token }}'` | The GitHub repo access token to be used for Reviewdog.                                                                                                             |
+| `reporter`      | no       | `'github-pr-review'`    | Set the [reporter](https://github.com/reviewdog/reviewdog#reporters) type for Reviewdog.                                                                           |
+| `fail_on_error` | no       | `'true'`                | By default, Reviewdog will return exit code 0 even if it finds errors. If `fail_on_error` is enabled, Reviewdog exits with 1 when at least one error was reported. |
+| `filter_mode`   | no       | `'added'`               | Set the [filter mode](https://github.com/reviewdog/reviewdog#filter-mode) for Reviewdog.                                                                           |
 
 ## Outputs
 
