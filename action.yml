@@ -1,0 +1,86 @@
+name: Vale
+description: A GitHub action to run vale for spellchecking.
+
+branding:
+  icon: edit
+  color: orange
+
+inputs:
+  version:
+    description: Vale release version to use.
+    required: false
+    default: ""
+  flags:
+    description: Space-delimited list of flags for the Vale CLI. To see a full list of available flags, run `vale -h`.
+    required: false
+    default: ""
+  files:
+    description: Space-delimited list of file or directory arguments; equivalent to calling `vale input1 input2`.
+    required: false
+    default: "."
+  with_reviewdog:
+    description: Whether to use Vale with Reviewdog.
+    required: false
+    default: "false"
+  github_token:
+    description: GitHub repo auth token to use with Reviewdog.
+    required: false
+    default: ${{ github.token }}
+  reporter:
+    description: Set the reporter type for Reviewdog.
+    required: false
+    default: "github-check"
+  fail_on_error:
+    description: By default, Reviewdog will return exit code 0 even if it finds errors. If `fail_on_error` is enabled, Reviewdog exits with 1 when at least one error was reported.
+    required: false
+    default: "true"
+  filter_mode:
+    description: Set the [filter mode](https://github.com/reviewdog/reviewdog#filter-mode) for Reviewdog.
+    required: false
+    default: "added"
+
+runs:
+  using: composite
+  steps:
+    - name: 🐧 Check for Linux
+      shell: bash
+      run: |
+        if ! [ "$RUNNER_OS" == "Linux" ]; then
+          echo "ERROR: simbo/vale-action is only for linux runners"
+          exit 1
+        fi
+
+    - name: 🛠 Install Vale
+      shell: bash
+      run: |
+        mkdir -p ${RUNNER_TEMP}/bin
+        if [[ "${{ inputs.version }}" = "" ]]; then
+          $valeVersion="$(curl -sfL https://api.github.com/repos/errata-ai/vale/releases/latest | grep '"tag_name":' | cut -d \" -f 4 | cut -d v -f 2)"
+        else
+          $valeVersion="${{ inputs.version }}"
+        fi
+        if ! [[ "$valeVersion" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          echo "ERROR: vale version '${valeVersion}' is not a valid semver version"
+          exit 1
+        fi
+        curl -sfL https://github.com/errata-ai/vale/releases/download/v${valeVersion}/vale_${valeVersion}_Linux_64-bit.tar.gz -o vale.tar.gz
+        tar -xvzf vale.tar.gz -C ${RUNNER_TEMP}/bin
+        rm vale.tar.gz
+        export PATH="${RUNNER_TEMP}/bin:$PATH"
+        vale sync
+
+    - name: 🛠 Install Reviewdog
+      if: ${{ inputs.with_reviewdog == 'true' }}
+      shell: bash
+      run: |
+        curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh | sh -s -- -b ${RUNNER_TEMP}/bin
+
+    - name: 🧑‍🏫 Run Vale with Reviewdog
+      if: ${{ inputs.with_reviewdog == 'true' }}
+      shell: bash
+      run: vale --output=rdjsonl.tmpl ${{ inputs.flags }} ${{ inputs.files }} | reviewdog -f=rdjsonl -name=vale -reporter=${{ inputs.reporter }} -fail-on-error=${{ inputs.fail_on_error }} -filter-mode=${{ inputs.filter_mode }} -level=info
+
+    - name: 🧑‍🏫 Run Vale
+      if: ${{ inputs.with_reviewdog != 'true' }}
+      shell: bash
+      run: vale ${{ inputs.flags }} ${{ inputs.files }}
