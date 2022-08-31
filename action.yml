@@ -96,4 +96,4 @@ runs:
         echo "::group::Vale output for Reviewdog"
         echo -e "$output"
         echo "::endgroup::"
-        echo -e "$output" | reviewdog -f=rdjsonl -name=vale -reporter=${{ inputs.reporter }} -fail-on-error=${{ inputs.fail_on_error }} -filter-mode=${{ inputs.filter_mode }} -level=info
+        printf "$output" | reviewdog -f=rdjsonl -name=vale -reporter=${{ inputs.reporter }} -fail-on-error=${{ inputs.fail_on_error }} -filter-mode=${{ inputs.filter_mode }} -level=info
