@@ -69,6 +69,11 @@ runs:
         echo "${RUNNER_TEMP}/bin" >> $GITHUB_PATH
         ${RUNNER_TEMP}/bin/vale sync
 
+    - name: 🧑‍🏫 Run Vale
+      if: ${{ inputs.reviewdog != 'true' }}
+      shell: bash
+      run: vale ${{ inputs.flags }} ${{ inputs.files }}
+
     - name: 🛠 Install Reviewdog
       if: ${{ inputs.reviewdog == 'true' }}
       shell: bash
@@ -79,10 +84,5 @@ runs:
       if: ${{ inputs.reviewdog == 'true' }}
       shell: bash
       env:
-        REVIEWDOG_GITHUB_API_TOKEN: ${ inputs.github_token}
+        REVIEWDOG_GITHUB_API_TOKEN: ${{ inputs.github_token }}
       run: vale --output=$GITHUB_ACTION_PATH/rdjsonl.tmpl ${{ inputs.flags }} ${{ inputs.files }} | reviewdog -f=rdjsonl -name=vale -reporter=${{ inputs.reporter }} -fail-on-error=${{ inputs.fail_on_error }} -filter-mode=${{ inputs.filter_mode }} -level=info
-
-    - name: 🧑‍🏫 Run Vale
-      if: ${{ inputs.reviewdog != 'true' }}
-      shell: bash
-      run: vale ${{ inputs.flags }} ${{ inputs.files }}
