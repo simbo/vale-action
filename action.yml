@@ -63,7 +63,7 @@ runs:
         tar -xvzf vale.tar.gz -C ${RUNNER_TEMP}/bin
         rm vale.tar.gz
         echo "${RUNNER_TEMP}/bin" >> $GITHUB_PATH
-        vale sync
+        ${RUNNER_TEMP}/bin/vale sync
 
     - name: 🛠 Install Reviewdog
       if: ${{ inputs.reviewdog == 'true' }}
