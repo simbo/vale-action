@@ -18,7 +18,7 @@ inputs:
     description: Space-delimited list of file or directory arguments; equivalent to calling `vale input1 input2`.
     required: false
     default: "."
-  with_reviewdog:
+  reviewdog:
     description: Whether to use Vale with Reviewdog.
     required: false
     default: "false"
@@ -66,17 +66,17 @@ runs:
         vale sync
 
     - name: 🛠 Install Reviewdog
-      if: ${{ inputs.with_reviewdog == 'true' }}
+      if: ${{ inputs.reviewdog == 'true' }}
       shell: bash
       run: |
         curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh | sh -s -- -b ${RUNNER_TEMP}/bin
 
     - name: 🧑‍🏫 Run Vale with Reviewdog
-      if: ${{ inputs.with_reviewdog == 'true' }}
+      if: ${{ inputs.reviewdog == 'true' }}
       shell: bash
       run: vale --output=rdjsonl.tmpl ${{ inputs.flags }} ${{ inputs.files }} | reviewdog -f=rdjsonl -name=vale -reporter=${{ inputs.reporter }} -fail-on-error=${{ inputs.fail_on_error }} -filter-mode=${{ inputs.filter_mode }} -level=info
 
     - name: 🧑‍🏫 Run Vale
-      if: ${{ inputs.with_reviewdog != 'true' }}
+      if: ${{ inputs.reviewdog != 'true' }}
       shell: bash
       run: vale ${{ inputs.flags }} ${{ inputs.files }}
