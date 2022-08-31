@@ -22,10 +22,6 @@ inputs:
     description: Whether to use Vale with Reviewdog.
     required: false
     default: "false"
-  github_token:
-    description: GitHub repo auth token to use with Reviewdog.
-    required: false
-    default: ${{ github.token }}
   reporter:
     description: Set the reporter type for Reviewdog.
     required: false
