@@ -1,6 +1,7 @@
 # simbo/vale-action
 
-A GitHub action to run [Vale](https://vale.sh/) for spell-checking.
+A GitHub action to run [Vale](https://vale.sh/) for spell-checking with optional
+[Reviewdog](https://github.com/reviewdog/reviewdog) integration.
 
 It does pretty much the same like the [official Vale action](https://github.com/errata-ai/vale-action),
 but as this one is not using Docker, it's much faster.
