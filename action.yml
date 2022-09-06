@@ -54,7 +54,7 @@ runs:
       shell: bash
       run: |
         if [[ "${{ inputs.version }}" = "" ]]; then
-          valeVersion="$(curl -sfL https://api.github.com/repos/errata-ai/vale/releases/latest | grep '"tag_name":' | cut -d \" -f 4 | cut -d v -f 2)"
+          valeVersion="$(curl -sL https://api.github.com/repos/errata-ai/vale/releases/latest | grep '"tag_name":' | cut -d \" -f 4 | cut -d v -f 2)"
         else
           valeVersion="${{ inputs.version }}"
         fi
@@ -63,7 +63,7 @@ runs:
           exit 1
         fi
         echo "::group::Vale Installation"
-        curl -sfL https://github.com/errata-ai/vale/releases/download/v${valeVersion}/vale_${valeVersion}_Linux_64-bit.tar.gz -o vale.tar.gz
+        curl -sL https://github.com/errata-ai/vale/releases/download/v${valeVersion}/vale_${valeVersion}_Linux_64-bit.tar.gz -o vale.tar.gz
         mkdir -p ${RUNNER_TEMP}/bin
         tar -xvzf vale.tar.gz -C ${RUNNER_TEMP}/bin
         rm vale.tar.gz
@@ -83,7 +83,7 @@ runs:
       shell: bash
       run: |
         echo "::group::Reviewdog Installation"
-        curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh | sh -s -- -b ${RUNNER_TEMP}/bin
+        curl -sL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh | sh -s -- -b ${RUNNER_TEMP}/bin
         echo "::endgroup::"
 
     - name: 🧑‍🏫 Run Vale with Reviewdog
