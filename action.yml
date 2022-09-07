@@ -54,12 +54,12 @@ runs:
       shell: bash
       run: |
         if [[ "${{ inputs.version }}" = "" ]]; then
-          valeVersionData=$(curl -sfL https://api.github.com/repos/errata-ai/vale/releases/latest)
-          if [[ "$valeVersionData" = "" ]]; then
+          curl -sfL https://api.github.com/repos/errata-ai/vale/releases/latest -o "${RUNNER_TEMP}/vale-latest-version.json"
+          if ! [[ -f "${RUNNER_TEMP}/vale-latest-version.json" ]]; then
             echo "::error title=GitHub API Error::Could not retrieve the latest Vale version info from GitHub API."
             exit 1
           fi
-          valeVersion="$(printf "$valeVersionData" | grep '"tag_name":' | cut -d \" -f 4 | cut -d v -f 2)"
+          valeVersion="$(cat "${RUNNER_TEMP}/vale-latest-version.json" | grep '"tag_name":' | cut -d \" -f 4 | cut -d v -f 2)"
         else
           valeVersion="${{ inputs.version }}"
         fi
@@ -68,14 +68,13 @@ runs:
           exit 1
         fi
         echo "::group::Vale Installation"
-        curl -sfL https://github.com/errata-ai/vale/releases/download/v${valeVersion}/vale_${valeVersion}_Linux_64-bit.tar.gz -o vale.tar.gz
-        if ! [[ -f vale.tar.gz ]]; then
+        curl -sfL https://github.com/errata-ai/vale/releases/download/v${valeVersion}/vale_${valeVersion}_Linux_64-bit.tar.gz -o "${RUNNER_TEMP}/vale.tar.gz"
+        if ! [[ -f "${RUNNER_TEMP}/vale.tar.gz" ]]; then
           echo "::error title=Vale Download failed::Downloading the latest Vale version failed."
           exit 1
         fi
-        mkdir -p ${RUNNER_TEMP}/bin
-        tar -xvzf vale.tar.gz -C ${RUNNER_TEMP}/bin
-        rm vale.tar.gz
+        mkdir -p "${RUNNER_TEMP}/bin"
+        tar -xvzf "${RUNNER_TEMP}/vale.tar.gz" -C "${RUNNER_TEMP}/bin"
         echo "${RUNNER_TEMP}/bin" >> $GITHUB_PATH
         echo "::endgroup::"
         echo "::group::Syncing Vale"
@@ -92,12 +91,12 @@ runs:
       shell: bash
       run: |
         echo "::group::Reviewdog Installation"
-        reviewdogScript=$(curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh)
-        if [[ "$reviewdogScript" = "" ]]; then
+        curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh -o "${RUNNER_TEMP}/reviewdog-script.sh"
+        if ! [[ -f "${RUNNER_TEMP}/reviewdog-script.sh" ]]; then
           echo "::error title=Reviewdog Download failed::Downloading the Reviewdog script from GitHub failed."
           exit 1
         fi
-        printf "$reviewdogScript" | sh -s -- -b ${RUNNER_TEMP}/bin
+        cat "${RUNNER_TEMP}/reviewdog-script.sh" | sh -s -- -b ${RUNNER_TEMP}/bin
         echo "::endgroup::"
 
     - name: 🧑‍🏫 Run Vale with Reviewdog
