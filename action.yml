@@ -54,7 +54,7 @@ runs:
       shell: bash
       run: |
         if [[ "${{ inputs.version }}" = "" ]]; then
-          curl -sfL https://api.github.com/repos/errata-ai/vale/releases/latest -o "${RUNNER_TEMP}/vale-latest-version.json"
+          curl -sfL https://api.github.com/repos/errata-ai/vale/releases/latest -o "${RUNNER_TEMP}/vale-latest-version.json" || true
           if ! [[ -f "${RUNNER_TEMP}/vale-latest-version.json" ]]; then
             echo "::error title=GitHub API Error::Could not retrieve the latest Vale version info from GitHub API."
             exit 1
@@ -68,7 +68,7 @@ runs:
           exit 1
         fi
         echo "::group::Vale Installation"
-        curl -sfL https://github.com/errata-ai/vale/releases/download/v${valeVersion}/vale_${valeVersion}_Linux_64-bit.tar.gz -o "${RUNNER_TEMP}/vale.tar.gz"
+        curl -sfL https://github.com/errata-ai/vale/releases/download/v${valeVersion}/vale_${valeVersion}_Linux_64-bit.tar.gz -o "${RUNNER_TEMP}/vale.tar.gz" || true
         if ! [[ -f "${RUNNER_TEMP}/vale.tar.gz" ]]; then
           echo "::error title=Vale Download failed::Downloading the latest Vale version failed."
           exit 1
