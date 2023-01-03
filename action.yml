@@ -53,6 +53,7 @@ runs:
     - name: 🛠 Install Vale
       shell: bash
       run: |
+        set -x
         if [[ "${{ inputs.version }}" = "" ]]; then
           curl -sfL https://api.github.com/repos/errata-ai/vale/releases/latest -o "${RUNNER_TEMP}/vale-latest-version.json"
           if ! [[ -f "${RUNNER_TEMP}/vale-latest-version.json" ]]; then
