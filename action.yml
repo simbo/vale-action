@@ -59,7 +59,7 @@ runs:
       shell: bash
       run: |
         echo "::add-mask::${{ inputs.github_com_pat }}"
-        if [[ "${ inputs.github_com_pat }" = "" ]]; then
+        if [[ "${{ inputs.github_com_pat }}" = "" ]]; then
           pat=""
         else
           pat="${{ inputs.github_com_pat }}@"
