@@ -51,6 +51,9 @@ runs:
     - name: 🐧 Check for Linux
       shell: bash
       run: |
+        # 🐧 Check for Linux
+
+        # exit with error if the runner is not Linux
         if ! [ "$RUNNER_OS" == "Linux" ]; then
           echo "::error title=runner os is $RUNNER_OS::simbo/vale-action is only for linux runners"
           exit 1
@@ -60,17 +63,25 @@ runs:
       id: github-auth
       shell: bash
       run: |
+        # 🤝 Prepare GitHub API Auth
+
+        # mask and set the GitHub PAT if present
         if [[ "${{ inputs.github_com_pat }}" = "" ]]; then
           pat=""
         else
           echo "::add-mask::${{ inputs.github_com_pat }}"
           pat="${{ inputs.github_com_pat }}@"
         fi
+
+        # provide the GitHub PAT to other steps
         echo "pat=${pat}" >> $GITHUB_OUTPUT
 
     - name: 🛠 Install Vale
       shell: bash
       run: |
+        # 🛠 Install Vale
+
+        # get latest version or use fixed version input
         if [[ "${{ inputs.version }}" = "" ]]; then
           curl -sfL https://${{ steps.github-auth.outputs.pat }}api.github.com/repos/errata-ai/vale/releases/latest -o "${RUNNER_TEMP}/vale-latest-version.json" || true
           if ! [[ -f "${RUNNER_TEMP}/vale-latest-version.json" ]]; then
@@ -82,11 +93,13 @@ runs:
           valeVersion="${{ inputs.version }}"
         fi
 
+        # validate semver version format
         if ! [[ "$valeVersion" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
           echo "::error title=Invalid Version::The Vale version '${valeVersion}' is not a valid semver version."
           exit 1
         fi
 
+        # install vale
         echo "::group::Vale Installation"
         curl -sfL https://${{ steps.github-auth.outputs.pat }}github.com/errata-ai/vale/releases/download/v${valeVersion}/vale_${valeVersion}_Linux_64-bit.tar.gz -o "${RUNNER_TEMP}/vale.tar.gz" || true
         if ! [[ -f "${RUNNER_TEMP}/vale.tar.gz" ]]; then
@@ -98,6 +111,7 @@ runs:
         echo "${RUNNER_TEMP}/bin" >> $GITHUB_PATH
         echo "::endgroup::"
 
+        # setup (or "sync") vale
         echo "::group::Syncing Vale"
         ${RUNNER_TEMP}/bin/vale sync
         echo "::endgroup::"
@@ -105,12 +119,15 @@ runs:
     - name: 🧑‍🏫 Run Vale
       if: ${{ inputs.reviewdog != 'true' }}
       shell: bash
-      run: vale ${{ inputs.flags }} ${{ inputs.files }}
+      run: |
+        # 🧑‍🏫 Run Vale
+        vale ${{ inputs.flags }} ${{ inputs.files }}
 
     - name: 🛠 Install Reviewdog
       if: ${{ inputs.reviewdog == 'true' }}
       shell: bash
       run: |
+        # 🛠 Install Reviewdog
         echo "::group::Reviewdog Installation"
         curl -sfL https://${{ steps.github-auth.outputs.pat }}raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh -o "${RUNNER_TEMP}/reviewdog-script.sh"
         if ! [[ -f "${RUNNER_TEMP}/reviewdog-script.sh" ]]; then
@@ -126,6 +143,7 @@ runs:
       env:
         REVIEWDOG_GITHUB_API_TOKEN: ${{ inputs.github_token }}
       run: |
+        # 🧑‍🏫 Run Vale with Reviewdog
         output=$(vale --no-exit --output=$GITHUB_ACTION_PATH/rdjsonl.tmpl ${{ inputs.flags }} ${{ inputs.files }})
         echo "::group::Vale output for Reviewdog"
         echo -e "$output"
