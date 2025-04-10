@@ -64,7 +64,7 @@ runs:
           echo "::add-mask::${{ inputs.github_com_pat }}"
           pat="${{ inputs.github_com_pat }}@"
         fi
-        echo "::set-output name=pat::$pat"
+        echo "pat=${pat}" >> $GITHUB_OUTPUT
 
     - name: 🛠 Install Vale
       shell: bash
